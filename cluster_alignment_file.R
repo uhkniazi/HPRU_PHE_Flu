@@ -13,7 +13,7 @@ msa = readDNAMultipleAlignment(csFile, format = 'fasta')
 # cluster the data using hamming/edit distance
 sDist = stringDist(as(msa, 'DNAStringSet'), method='hamming')
 hc = hclust(sDist, method = 'single')
-plot(hc, hang=-1)
+plot(hc, hang=-1, label=F, sub='', xlab='')
 
 # calculate number of clusters using PCA
 m = as.matrix(sDist)
@@ -30,9 +30,11 @@ print(paste('Number of possible clusters = ', iClust.count))
 # cut the tree into sub clusters
 cut.pt = cutree(hc, k = iClust.count)
 dfReport = data.frame(Seq_name=names(cut.pt), Cluster=cut.pt)
-csFile.report = paste(csFile, 'clusters.csv', sep='')
+csFile.report = paste(csFile, '.clusters.csv', sep='')
 write.csv(dfReport, file=csFile.report)
 
+print(paste('Cluster Distribution'))
+print(as.data.frame(table(cut.pt)))
 
 # get the label for the largest cluster
 iLargest = which.max(as.vector(table(cut.pt)))
@@ -51,7 +53,7 @@ rowmask(msa.rm) = IRanges(start=ivLargest.not, end=ivLargest.not)
 # repeat the clustering process
 sDist = stringDist(as(msa.rm, 'DNAStringSet'), method='hamming')
 hc = hclust(sDist, method = 'single')
-plot(hc, hang=-1)
+plot(hc, hang=-1, label=F, sub='', xlab='')
 m = as.matrix(sDist)
 pr.out = prcomp(m, scale=T)
 
@@ -61,3 +63,14 @@ plot(pr.out$x[,1:2], pch=19, xlab='Z1', ylab='Z2', main='PCA comp 1 and 2')
 iClust.count = f_iGetPCAClusterCount(pr.out)
 print(paste('Number of possible clusters = ', iClust.count))
 
+# cut the tree into sub clusters
+cut.pt.2 = cutree(hc, k = iClust.count)
+dfReport.2 = data.frame(Seq_name=names(cut.pt.2), Cluster=cut.pt.2)
+csFile.report = paste(csFile, '.clusters_level_2.csv', sep='')
+write.csv(dfReport.2, file=csFile.report)
+
+print(paste('Cluster Distribution'))
+print(as.data.frame(table(cut.pt.2)))
+
+## decide on a cutoff point while slicing the cluster cutoff
+## until we have a cluster size smaller than 10 
