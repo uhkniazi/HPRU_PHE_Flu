@@ -70,7 +70,7 @@ while(TRUE){
   
   # cut the tree into sub clusters
   cut.pt = cutree(hc, k = iClust.count)
-    
+  
   # get the label for the largest cluster
   iLargest = which.max(as.vector(table(cut.pt)))
   df = as.data.frame(table(cut.pt))
@@ -85,15 +85,19 @@ while(TRUE){
 }
 
 # get the cutpoint for the tree when it has been split into minimum number of clusters
-cut.ht = max(hc$height)
+cut.ht = quantile(hc$height, 0.95)
 
 sDist = sDist.bk
 hc = hclust(sDist, method = 'single')
 
 cut.pt = cutree(hc, h = cut.ht)
+plot(hc, hang=-1, label=F, sub='', xlab='')
+abline(h = cut.ht, lwd=2, col=2)
+
 # maximum possible number of clusters
 print(paste('Maximum possible clusters = ', length(unique(cut.pt))))
+print(paste('Cut Height Recommended = ', round(cut.ht, 3)))
 dfReport = data.frame(Seq_name=names(cut.pt), Cluster=cut.pt)
 csFile.report = paste(csFile, '.clusters_max.csv', sep='')
 write.csv(dfReport, file=csFile.report)
-
+      
