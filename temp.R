@@ -1,4 +1,29 @@
 # testing script
+
+# test distance distribution
+t = sample(m, 10000)
+t = sqrt(t)
+r = range(t)
+s = seq(floor(r[1])-0.5, ceiling(r[2])+0.5, by=1)
+r[1] = floor(r[1])
+r[2] = ceiling(r[2])
+# which distribution can approximate the frequency of reactome terms
+hist(t, prob=T, main='degree distribution of type 2 vertices', breaks=s,
+     xlab='log degree', ylab='')
+# try negative binomial and poisson distributions
+# parameterized on the means
+dn = dnbinom(r[1]:r[2], size = mean(t), mu = mean(t))
+dp = dpois(r[1]:r[2], mean(t))
+dnr = dnorm(r[1]:r[2], mean(t), sd(t))
+lines(r[1]:r[2], dn, col='black', type='b')
+lines(r[1]:r[2], dp, col='red', type='b')
+lines(r[1]:r[2], dnr, col='blue', type='b')
+legend('topright', legend =c('nbinom', 'poi'), fill = c('black', 'red'))
+
+
+
+
+
 library(Biostrings)
 
 #f = file.choose()
